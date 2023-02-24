@@ -1,3 +1,5 @@
+import requests
+import PIL
 from flask import Flask, render_template, request, send_from_directory
 import openai
 import os
@@ -12,6 +14,10 @@ openai.api_key = "Your key"
 def index():
     return render_template('index.html')
 
+@app.route('/script.js')
+def serve_script():
+  return send_from_directory('static', 'script.js')
+
 # Create route to handle form submission
 @app.route('/generate-image', methods=['POST'])
 def generate_image():
@@ -24,18 +30,19 @@ def generate_image():
     # Call OpenAI API to generate image
     response = openai.Image.create(
         prompt=f"Generate an image of size {image_size} with a {bg_color} background in the style of {image_style}.",
-        n=1
+        n=1,
+        model='image-alpha-001'
     )
 
-    # Save the generated image to the images directory
+    # Save the generated image to the images directory as a PNG file
     img_url = response['data'][0]['url']
     img_filename = img_url.split('/')[-1]
-    img_path = f"images/{img_filename}"
+    img_path = f"images/{img_filename.split('.')[0]}.png"
     with open(img_path, 'wb') as f:
         f.write(requests.get(img_url).content)
 
     # Serve the generated image to the front-end
-    return send_from_directory('images', img_filename)
+    return send_from_directory('images', f"{img_filename.split('.')[0]}.png")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='60', debug=True)
