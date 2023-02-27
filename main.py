@@ -20,7 +20,7 @@ def index():
   
 @app.route('/generated-images/<path:filename>')
 def serve_generated_image(filename):
-    return send_file(f'images/{filename}', mimetype='image/png')
+    return send_file(f'images/{filename}.png', mimetype='image/png')
 
 @app.route('/script.js')
 def serve_script():
@@ -47,9 +47,11 @@ def generate_image():
     img_path = f"images/{img_filename.split('.')[0]}.png"
     with open(img_path, 'wb') as f:
         f.write(requests.get(img_url).content)
-      
+
     # Serve the generated image to the front-end
     return send_from_directory('images', f"{img_filename.split('.')[0]}.png")
+
+
   
     # Return path to generated image
     return render_template('index.html', image=img_path)
