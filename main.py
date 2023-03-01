@@ -1,5 +1,5 @@
 import requests
-import PIL
+from PIL import Image
 from flask import Flask, render_template, request, send_from_directory
 from flask import send_file
 import openai
@@ -56,6 +56,10 @@ def generate_image():
     # Return path to generated image
     return render_template('index.html', image=img_path)
     return
+
+image = Image.open("the.png")# Display the image
+image.show()
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='60', debug=True)
