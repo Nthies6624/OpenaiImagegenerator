@@ -1,12 +1,12 @@
-const form = document.getElementById('image-form');
+const imageForm = document.getElementById('image-form');
 const imageContainer = document.getElementById('image-container');
 
-form.addEventListener('submit', async (event) => {
+imageForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    const imageSize = form.elements['image-size'].value;
-    const bgColor = form.elements['background-color'].value;
-    const imageStyle = form.elements['image-style'].value;
+    const imageSize = imageForm.elements['image-size'].value;
+    const bgColor = imageForm.elements['background-color'].value;
+    const imageStyle = imageForm.elements['image-style'].value;
 
     const response = await fetch('/generate-image', {
         method: 'POST',
@@ -22,8 +22,15 @@ form.addEventListener('submit', async (event) => {
 
     if (response.ok) {
         const imageUrl = await response.text();
-        imageContainer.innerHTML = `<img src="${imageUrl}" alt="Generated Image">`;
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = 'Generated Image';
+        imageContainer.innerHTML = '';
+        imageContainer.appendChild(img);
     } else {
         console.error('Error generating image:', response);
     }
 });
+
+
+
