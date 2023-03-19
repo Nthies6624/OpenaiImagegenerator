@@ -1,48 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>OpenAI Image Generator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DALL-E Image Generation App</title>
 </head>
 <body>
-    <h1>OpenAI Image Generator</h1>
-
-    <form id="image-form">
-        <label for="image-size">Image Size:</label>
-        <select name="image-size" id="image-size">
-            <option value="256x256">256x256</option>
-            <option value="512x512">512x512</option>
-            <option value="1024x1024">1024x1024</option>
-        </select>
-
-        <label for="background-color">Background Color:</label>
-        <select name="background-color" id="background-color">
-            <option value="white">White</option>
-            <option value="black">Black</option>
-            <option value="red">Red</option>
-            <option value="green">Green</option>
-            <option value="blue">Blue</option>
-        </select>
-
-        <label for="image-style">Image Style:</label>
-        <select name="image-style" id="image-style">
-            <option value="abstract">Abstract</option>
-            <option value="sketch">Sketch</option>
-            <option value="painting">Painting</option>
-            <option value="photo">Photo</option>
-        </select>
-
-        <button type="submit">Generate Image</button>
+    <h1>DALL-E Image Generation App</h1>
+    <form action="/" method="POST">
+        <label for="prompt">Enter a prompt:</label>
+        <input type="text" id="prompt" name="prompt" required>
+        <input type="submit" value="Generate Image">
     </form>
-
- <img id="logo" src="/images/the.png" alt="A description of the image">
-
-
-
-
-    <div id="image-container"></div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@openai/image-gpt@1.0.0/dist/openai-image-gpt.js"></script>
-    <script src="static/script.js"></script>
-
 </body>
 </html>
