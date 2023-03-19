@@ -1,65 +1,46 @@
-import requests
-from PIL import Image
-from flask import Flask, render_template, request, send_from_directory
-from flask import send_file
-import openai
 import os
-my_secret = os.environ['Openai key']
-
-
-
-app = Flask(__name__, template_folder='templates')
+import requests
+from flask import Flask, render_template, request, send_from_directory, redirect, url_for
+import openai
+my_secret = os.environ['SECRET']
 
 # Set up OpenAI API key
 openai.api_key = my_secret
 
-# Create route to serve index.html
-@app.route('/')
+app = Flask(__name__)
+
+# Set up the uploads folder
+UPLOAD_FOLDER = "uploads"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+# Create the uploads folder if it doesn't exist
+if not os.path.exists(UPLOAD_FOLDER):
+  os.makedirs(UPLOAD_FOLDER)
+
+
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template('index.html')
-  
-@app.route('/generated-images/<path:filename>')
-def serve_generated_image(filename):
-    return send_file(f'images/{filename}.png', mimetype='image/png')
+  if request.method == "POST":
+    prompt = request.form["prompt"]
+    response = openai.Image.create(prompt=prompt, n=1, size="512x512")
+    image_url = response["data"][0]["url"]
 
-@app.route('/script.js')
-def serve_script():
-    return send_from_directory('static', 'script.js')
+    # Download and save the image
+    response = requests.get(image_url)
+    image_filename = f"{prompt.replace(' ', '_')}.png"
+    with open(os.path.join(UPLOAD_FOLDER, image_filename), "wb") as f:
+      f.write(response.content)
 
-# Create route to handle form submission
-@app.route('/generate-image', methods=['POST'])
-def generate_image():
-    # Get user input from the form
-    image_size = request.form.get('image-size')
-    bg_color = request.form.get('background-color')
-    image_style = request.form.get('image-style')
+    return redirect(url_for("uploaded_file", filename=image_filename))
 
-    # Call OpenAI API to generate image
-    response = openai.Image.create(
-        prompt=f"Generate an image of size {image_size} with a {bg_color} background in the style of {image_style}.",
-        n=1,
-        model='image-alpha-001'
-    )
-
-    # Save the generated image to the images directory as a PNG file
-    img_url = response['data'][0]['url']
-    img_filename = img_url.split('/')[-1]
-    img_path = f"images/{img_filename.split('.')[0]}.png"
-    with open(img_path, 'wb') as f:
-        f.write(requests.get(img_url).content)
-
-    # Serve the generated image to the front-end
-    return send_from_directory('images', f"{img_filename.split('.')[0]}.png")
+  return render_template("index.html")
 
 
-  
-    # Return path to generated image
-    return render_template('index.html', image=img_path)
-    return
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+  return send_from_directory(app.config["UPLOAD_FOLDER"], os.path.basename(filename))
 
-image = Image.open("the.png")# Display the image
-image.show()
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port='60', debug=True)
+  app.run(host='0.0.0.0', port='40', debug=True)
