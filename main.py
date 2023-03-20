@@ -22,7 +22,8 @@ if not os.path.exists(UPLOAD_FOLDER):
 def index():
   if request.method == "POST":
     prompt = request.form["prompt"]
-    response = openai.Image.create(prompt=prompt, n=1, size="512x512")
+    size = request.form["size"]
+    response = openai.Image.create(prompt=prompt, n=1, size=size)
     image_url = response["data"][0]["url"]
 
     # Download and save the image
